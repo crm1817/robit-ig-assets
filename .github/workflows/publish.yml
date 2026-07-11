@@ -25,7 +25,8 @@ jobs:
       - name: Publish next due post
         run: node publish.js
         env:
-          ZAPIER_MCP_URL: ${{ secrets.ZAPIER_MCP_URL }}
+          # תומך גם בשם עם ה-typo (ZAPIER_MCP_UR) שנשמר בהגדרת הסוד המקורית
+          ZAPIER_MCP_URL: ${{ secrets.ZAPIER_MCP_URL || secrets.ZAPIER_MCP_UR }}
 
       - name: Commit updated schedule
         run: |
