@@ -1,0 +1,36 @@
+name: instagram-publisher
+
+on:
+  schedule:
+    - cron: '30 5 * * *'   # 08:30 שעון ישראל (קיץ) — כל יום
+  workflow_dispatch: {}     # הרצה ידנית לבדיקה
+
+permissions:
+  contents: write
+
+concurrency:
+  group: instagram-publisher
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Publish next due post
+        run: node publish.js
+        env:
+          ZAPIER_MCP_URL: ${{ secrets.ZAPIER_MCP_URL }}
+
+      - name: Commit updated schedule
+        run: |
+          git config user.name "robit-ig-bot"
+          git config user.email "support@robitdigital.com"
+          git add schedule.json
+          git diff --cached --quiet || git commit -m "mark post as published"
+          git push
